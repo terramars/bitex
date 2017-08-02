@@ -1,3 +1,4 @@
+from bitex.api.WSS import gdax
 from bitex.api.WSS.bitfinex import BitfinexWSS
 from bitex.api.WSS.bitstamp import BitstampWSS
 from bitex.api.WSS.gdax import GDAXWSS
