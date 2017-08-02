@@ -32,6 +32,8 @@ class GDAX(GDAXRest):
         return self.query('GET', endpoint, **kwargs)
 
     def private_query(self, endpoint, method_verb='POST', **kwargs):
+        if 'params' in kwargs and len(kwargs['params']) == 0:
+            del kwargs['params']
         return self.query(method_verb, endpoint, authenticate=True, **kwargs)
 
     """
