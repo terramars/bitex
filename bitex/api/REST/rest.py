@@ -149,7 +149,6 @@ class GdaxAuth(AuthBase):
 
     def __call__(self, request):
         timestamp = str(time.time())
-        print('\n\n', type(request.body), '\n\n', request.body,'\n\n')
         message = (timestamp + request.method + request.path_url +
                    (request.body or ''))
         hmac_key = base64.b64decode(self.secret_key)
@@ -184,12 +183,14 @@ class GDAXRest(APIClient):
 
     def sign(self, url, endpoint, endpoint_path, method_verb, *args, **kwargs):
         auth = GdaxAuth(self.key, self.secret, self.passphrase)
+        req_kwargs = {'auth': auth}
         try:
             js = kwargs['params']
+            req_kwargs['json'] = js
         except KeyError:
-            js = {}
+            pass
 
-        return url, {'json': js, 'auth': auth}
+        return url, req_kwargs
 
 
 class KrakenREST(APIClient):
