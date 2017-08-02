@@ -4,6 +4,7 @@ http://docs.bitfinex.com/
 
 # Import Built-Ins
 import logging
+from decimal import Decimal
 
 # Import Third-Party
 
@@ -17,6 +18,9 @@ log = logging.getLogger(__name__)
 
 
 class Bitfinex(BitfinexREST):
+
+    OFFER_RATE_MULTIPLIER = Decimal(36.5)
+
     def __init__(self, key='', secret='', key_file='', websocket=False):
         super(Bitfinex, self).__init__(key, secret)
         if key_file:
