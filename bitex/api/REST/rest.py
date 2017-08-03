@@ -149,9 +149,11 @@ class GdaxAuth(AuthBase):
 
     def __call__(self, request):
         timestamp = str(time.time())
-        message = (timestamp + request.method + request.path_url +
-                   (request.body or ''))
-        message = message.encode('ascii')
+        if request.body:
+            message = (timestamp + request.method + request.path_url + request.body.decode('utf-8'))
+        else:
+            message = (timestamp + request.method + request.path_url)
+        message = message.encode('utf-8')
         hmac_key = base64.b64decode(self.secret_key)
         signature = hmac.new(hmac_key, message, hashlib.sha256)
         signature_b64 = base64.b64encode(signature.digest())
@@ -187,7 +189,8 @@ class GDAXRest(APIClient):
         req_kwargs = {'auth': auth}
         try:
             js = kwargs['params']
-            req_kwargs['json'] = js
+            if len(js):
+                req_kwargs['json'] = js
         except KeyError:
             pass
 
