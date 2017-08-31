@@ -21,8 +21,8 @@ class Bitfinex(BitfinexREST):
 
     OFFER_RATE_MULTIPLIER = Decimal(36.5)
 
-    def __init__(self, key='', secret='', key_file='', websocket=False):
-        super(Bitfinex, self).__init__(key, secret)
+    def __init__(self, key='', secret='', key_file='', websocket=False, timeout=5):
+        super(Bitfinex, self).__init__(key, secret, timeout=timeout)
         if key_file:
             self.load_key(key_file)
         if websocket:
