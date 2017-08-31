@@ -111,6 +111,10 @@ class Bitfinex(BitfinexREST):
     """
 
     @return_api_response(None)
+    def multiple_new_orders(self, orders):
+        return self.private_query('order/new/multi', params=orders)
+
+    @return_api_response(None)
     def statistics(self, pair):
         return self.public_query('stats/%s' % pair)
 
