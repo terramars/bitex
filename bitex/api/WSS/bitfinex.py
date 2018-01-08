@@ -380,7 +380,10 @@ class BitfinexWSS(WSSAPI):
         log.info("handle_response: Handling response %s", resp)
         event = resp['event']
         try:
-            self._event_handlers[event](ts, **resp)
+            if 'ts' in resp:
+                self._event_handlers[event](**resp)
+            else:
+                self._event_handlers[event](ts, **resp) 
         # Handle Non-Critical Errors
         except (InvalidChannelError, InvalidPairError, InvalidBookLengthError,
                 InvalidBookPrecisionError) as e:
