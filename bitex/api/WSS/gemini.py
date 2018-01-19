@@ -50,8 +50,9 @@ class GeminiWSS(WSSAPI):
         :return:
         """
         try:
-            conn = create_connection(self.addr + endpoint, timeout=5)
+            conn = create_connection(self.addr + endpoint, timeout=30)
         except WebSocketTimeoutException:
+            log.error('gemini timeout connecting to %s' % endpoint)
             self.restart_q.put(endpoint)
             return
 
