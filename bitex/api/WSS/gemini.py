@@ -21,6 +21,7 @@ class GeminiWSS(WSSAPI):
         super(GeminiWSS, self).__init__('wss://api.gemini.com/v1/', 'Gemini')
         self.endpoints = (endpoints if endpoints else
                           requests.get('https://api.gemini.com/v1/symbols').json())
+        self.pairs = [x.upper() for x in self.endpoints]
         self.endpoints = ['marketdata/' + x.upper() for x in self.endpoints]
         self.endpoint_threads = {}
         self.threads_running = {}
@@ -49,8 +50,9 @@ class GeminiWSS(WSSAPI):
         :return:
         """
         try:
-            conn = create_connection(self.addr + endpoint, timeout=5)
+            conn = create_connection(self.addr + endpoint, timeout=30)
         except WebSocketTimeoutException:
+            log.error('gemini timeout connecting to %s' % endpoint)
             self.restart_q.put(endpoint)
             return
 
