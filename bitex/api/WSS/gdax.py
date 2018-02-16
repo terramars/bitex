@@ -28,6 +28,13 @@ class GDAXWSS(WSSAPI):
     def start(self):
         super(GDAXWSS, self).start()
 
+        self._data_thread = threading.Thread(target=self._process_level2)
+        self._data_thread.daemon = True
+        self._data_thread.start()
+
+    def start_full(self):
+        super(GDAXWSS, self).start()
+
         self._data_thread = threading.Thread(target=self._process_data)
         self._data_thread.daemon = True
         self._data_thread.start()
@@ -37,8 +44,26 @@ class GDAXWSS(WSSAPI):
 
         self._data_thread.join()
 
+    def _process_level2(self):
+        self.conn = create_connection(self.addr, timeout=10)
+        payload = json.dumps(
+            {
+                'type': 'subscribe', 'channels': [{'name': i, 'product_ids': self.pairs} for i in ('ticker', 'level2')]
+            }
+        )
+        self.conn.send(payload)
+        while self.running:
+            try:
+                data = json.loads(self.conn.recv())
+            except (WebSocketTimeoutException, ConnectionResetError):
+                self._controller_q.put('restart')
+                continue
+            if 'product_id' in data:
+                self.data_q.put((data['type'], data['product_id'], data, time.time()))
+        self.conn = None
+
     def _process_data(self):
-        self.conn = create_connection(self.addr, timeout=4)
+        self.conn = create_connection(self.addr, timeout=10)
         payload = json.dumps({'type': 'subscribe', 'product_ids': self.pairs})
         self.conn.send(payload)
         while self.running:
@@ -46,6 +71,7 @@ class GDAXWSS(WSSAPI):
                 data = json.loads(self.conn.recv())
             except (WebSocketTimeoutException, ConnectionResetError):
                 self._controller_q.put('restart')
+                continue
 
             if 'product_id' in data:
                 self.data_q.put(('order_book', data['product_id'],
