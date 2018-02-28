@@ -155,15 +155,16 @@ class BitfinexWSS(WSSAPI):
                     continue
                 log.info("BitfinexWSS.heartbeats: Channel %s has sent a "
                          "heartbeat again!", self.channel_labels[chan_id])
-            self.ping()
+            #self.ping()
 
     def _check_ping(self):
         """
         Checks if the ping command timed out and raises TimeoutError if so.
         :return:
         """
-        if time.time() - self.ping_timer > self.timeout:
-            raise TimeoutError("Ping Command timed out!")
+        return
+        #if time.time() - self.ping_timer > self.timeout:
+        #    raise TimeoutError("Ping Command timed out!")
 
     def pause(self):
         """
@@ -360,7 +361,7 @@ class BitfinexWSS(WSSAPI):
                                      "initiating restart")
                             self._controller_q.put('restart')
 
-                self._check_heartbeats(ts)
+                #self._check_heartbeats(ts)
                 self._processor_lock.release()
             else:
                 time.sleep(0.5)
